@@ -8,8 +8,8 @@ This recipe gives you two ways to do that:
 
 1. **Claude Read hook**
    Intercept local image reads and redirect them to a generated text file.
-2. **Discord adapter example**
-   Describe Discord attachments first, then append the resulting text to your normal prompt.
+2. **Discord integration example**
+   Describe Discord attachments first, then append the resulting text to your normal prompt instead of sending image blocks directly.
 
 ## Included files
 
@@ -105,7 +105,7 @@ The installer does not overwrite unrelated Claude settings.
 `MAX_WIDTH`
 : Defaults to `1400`
 
-## Discord adapter example
+## Discord integration example
 
 If your agent receives images over Discord, the same idea still applies:
 
@@ -114,7 +114,7 @@ If your agent receives images over Discord, the same idea still applies:
 - describe it first
 - append the text result into the normal prompt
 
-The example in [`examples/discord-adapter.ts`](./examples/discord-adapter.ts) shows the minimal shape without any project-specific session system.
+The example in [`examples/discord-adapter.ts`](./examples/discord-adapter.ts) keeps the shape minimal and does not depend on any project-specific session system.
 
 ## Direct use with subagents or `codex exec`
 
@@ -123,35 +123,16 @@ You do not need the Claude hook if you only want the image-to-text step itself.
 ### Direct CLI use
 
 ```bash
-node recipes/claude-cache-safe-images/hooks/image-describe.mjs ./screenshot.png
+node hooks/claude-cache-safe-images/hooks/image-describe.mjs ./screenshot.png
 ```
 
 ### Feed the result into `codex exec`
 
 ```bash
-IMG_TEXT="$(node recipes/claude-cache-safe-images/hooks/image-describe.mjs ./screenshot.png)"
+IMG_TEXT="$(node hooks/claude-cache-safe-images/hooks/image-describe.mjs ./screenshot.png)"
 codex exec "Treat the following as the screenshot content:\n\n$IMG_TEXT\n\nNow debug the issue."
 ```
 
 ### Feed the result into a subagent
 
-Use the same pattern: describe the image first, then pass the text to the subagent prompt. This is useful when you want the orchestration layer to stay cache-friendly while still giving the worker enough visual context.
-
-## Privacy notes
-
-This public version intentionally avoids:
-
-- hard-coded user paths
-- private OAuth files
-- private client IDs or secrets
-- project-specific bot names
-- repo-specific imports
-
-If your original implementation uses internal OCR tools or direct HTTP APIs, keep those private and expose only the integration contract here.
-
-## Limitations
-
-- OCR quality depends on your local OCR engine.
-- Gemini CLI behavior can vary by installed version and configured default model.
-- The example resize path is macOS-first because `sips` is cheap and already present there.
-- The generated temp description files are intentionally left in your temp directory so Claude can read them after the hook returns.
+Use the same pattern: describe the image first, then pass the text to the subagent prompt.

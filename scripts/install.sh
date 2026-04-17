@@ -4,7 +4,7 @@ set -euo pipefail
 
 SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
 REPO_ROOT=$(cd -- "$SCRIPT_DIR/.." && pwd)
-RECIPE_DIR="$REPO_ROOT/recipes/claude-cache-safe-images"
+RECIPE_DIR="$REPO_ROOT/hooks/claude-cache-safe-images"
 
 SETTINGS_DIR="$HOME/.claude"
 HOOK_DIR="$SETTINGS_DIR/hooks/agent-cookbook/claude-cache-safe-images"

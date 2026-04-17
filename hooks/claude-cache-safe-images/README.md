@@ -123,13 +123,13 @@ Installer 不會去改你其他不相干的 Claude 設定。
 ### 直接 CLI 使用
 
 ```bash
-node recipes/claude-cache-safe-images/hooks/image-describe.mjs ./screenshot.png
+node hooks/claude-cache-safe-images/hooks/image-describe.mjs ./screenshot.png
 ```
 
 ### 丟給 `codex exec`
 
 ```bash
-IMG_TEXT="$(node recipes/claude-cache-safe-images/hooks/image-describe.mjs ./screenshot.png)"
+IMG_TEXT="$(node hooks/claude-cache-safe-images/hooks/image-describe.mjs ./screenshot.png)"
 codex exec "Treat the following as the screenshot content:\n\n$IMG_TEXT\n\nNow debug the issue."
 ```
 

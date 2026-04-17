@@ -7,6 +7,10 @@ TEST_HOME=$(mktemp -d)
 TEST_BIN=$(mktemp -d)
 trap 'rm -rf "$TEST_HOME" "$TEST_BIN"' EXIT
 
+test -f "$REPO_ROOT/hooks/claude-cache-safe-images/README.md"
+test -d "$REPO_ROOT/prompt-engineering"
+test -d "$REPO_ROOT/context-engineering"
+
 mkdir -p "$TEST_HOME/.claude"
 printf '{}\n' > "$TEST_HOME/.claude/settings.json"
 

@@ -6,9 +6,17 @@ Practical recipes for making coding agents cheaper, safer, and easier to operate
 
 This repository starts with one small chapter and leaves room for many more:
 
-| Recipe | What it solves |
-| --- | --- |
-| [`claude-cache-safe-images`](./recipes/claude-cache-safe-images/README.en.md) | Effective ways to stop image inputs from wrecking Claude cache reuse |
+## Repository sections
+
+- [`hooks/`](./hooks/) for executable hooks, interceptors, and operational scripts
+- [`prompt-engineering/`](./prompt-engineering/) for prompt templates and prompt assembly patterns
+- [`context-engineering/`](./context-engineering/) for memory, summarization, compression, and context-loading patterns
+
+## Current entries
+
+| Section | Recipe | What it solves |
+| --- | --- | --- |
+| Hooks | [`claude-cache-safe-images`](./hooks/claude-cache-safe-images/README.en.md) | Effective ways to stop image inputs from wrecking Claude cache reuse |
 
 ## Why this repo exists
 
@@ -23,7 +31,7 @@ Many useful agent improvements are too small for a full framework but too valuab
 
 ## Current focus
 
-The first recipe is titled:
+The first recipe lives under `hooks/`:
 
 **Fix Claude cache breakage caused by image inputs**
 

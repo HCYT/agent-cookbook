@@ -6,9 +6,17 @@
 
 目前先從第一篇小章節開始，之後會慢慢把其他實用 recipe 補進來。
 
-| Recipe | 解決什麼問題 |
-| --- | --- |
-| [`claude-cache-safe-images`](./recipes/claude-cache-safe-images/README.md) | 有效解決 Claude 因圖片輸入導致 cache 被破壞的問題 |
+## 目前目錄怎麼分
+
+- [`hooks/`](./hooks/)：放可直接用的 hook、攔截器、工具腳本
+- [`prompt-engineering/`](./prompt-engineering/)：放 prompt 模板、提示策略、提示組裝方式
+- [`context-engineering/`](./context-engineering/)：放記憶、摘要、壓縮、上下文載入策略
+
+## 目前收錄內容
+
+| 分類 | Recipe | 解決什麼問題 |
+| --- | --- | --- |
+| Hooks | [`claude-cache-safe-images`](./hooks/claude-cache-safe-images/README.md) | 有效解決 Claude 因圖片輸入導致 cache 被破壞的問題 |
 
 ## 為什麼做這個 repo
 
@@ -23,7 +31,7 @@
 
 ## 目前主題
 
-第一篇 recipe 主題是：
+第一篇 recipe 主題放在 `hooks/` 底下：
 
 **有效解決 Claude cache 被破壞的問題**
 
