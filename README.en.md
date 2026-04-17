@@ -47,8 +47,8 @@ If you already have `gemini`, `node`, and `jq`, the current recipe is close to p
 ```bash
 git clone <repo-url>
 cd agent-cookbook
-bash scripts/install.sh
-bash scripts/doctor.sh
+bash hooks/claude-cache-safe-images/scripts/install.sh
+bash hooks/claude-cache-safe-images/scripts/doctor.sh
 ```
 
 That installs the Claude `Read` hook into `~/.claude/hooks/agent-cookbook/claude-cache-safe-images` and updates `~/.claude/settings.json` for you.

@@ -47,8 +47,8 @@
 ```bash
 git clone <repo-url>
 cd agent-cookbook
-bash scripts/install.sh
-bash scripts/doctor.sh
+bash hooks/claude-cache-safe-images/scripts/install.sh
+bash hooks/claude-cache-safe-images/scripts/doctor.sh
 ```
 
 它會自動把 Claude `Read` hook 裝到 `~/.claude/hooks/agent-cookbook/claude-cache-safe-images`，也會順手幫你更新 `~/.claude/settings.json`。

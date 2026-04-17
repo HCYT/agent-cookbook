@@ -2,7 +2,8 @@
 
 set -euo pipefail
 
-REPO_ROOT=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+CASE_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+REPO_ROOT=$(cd -- "$CASE_DIR/../.." && pwd)
 TEST_HOME=$(mktemp -d)
 TEST_BIN=$(mktemp -d)
 trap 'rm -rf "$TEST_HOME" "$TEST_BIN"' EXIT
@@ -20,8 +21,8 @@ echo "stub gemini"
 EOF
 chmod +x "$TEST_BIN/gemini"
 
-HOME="$TEST_HOME" PATH="$TEST_BIN:$PATH" bash "$REPO_ROOT/scripts/install.sh"
-HOME="$TEST_HOME" PATH="$TEST_BIN:$PATH" bash "$REPO_ROOT/scripts/install.sh"
+HOME="$TEST_HOME" PATH="$TEST_BIN:$PATH" bash "$CASE_DIR/scripts/install.sh"
+HOME="$TEST_HOME" PATH="$TEST_BIN:$PATH" bash "$CASE_DIR/scripts/install.sh"
 
 HOOK_DIR="$TEST_HOME/.claude/hooks/agent-cookbook/claude-cache-safe-images"
 SETTINGS_PATH="$TEST_HOME/.claude/settings.json"
@@ -48,4 +49,4 @@ COUNT=$(jq -r --arg cmd "bash $HOOK_DIR/intercept-image-read.sh" '
 
 [ "$COUNT" = "1" ]
 
-HOME="$TEST_HOME" PATH="$TEST_BIN:$PATH" bash "$REPO_ROOT/scripts/doctor.sh" >/dev/null
+HOME="$TEST_HOME" PATH="$TEST_BIN:$PATH" bash "$CASE_DIR/scripts/doctor.sh" >/dev/null

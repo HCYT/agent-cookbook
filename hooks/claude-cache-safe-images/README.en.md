@@ -51,6 +51,7 @@ This keeps the main session free of raw image blocks and usually preserves bette
 If you already have `gemini`, `node`, and `jq`:
 
 ```bash
+cd hooks/claude-cache-safe-images
 bash scripts/install.sh
 bash scripts/doctor.sh
 ```

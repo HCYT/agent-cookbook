@@ -51,6 +51,7 @@
 如果你已經裝好 `gemini`、`node`、`jq`：
 
 ```bash
+cd hooks/claude-cache-safe-images
 bash scripts/install.sh
 bash scripts/doctor.sh
 ```

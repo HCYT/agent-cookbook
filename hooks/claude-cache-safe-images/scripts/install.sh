@@ -3,7 +3,7 @@
 set -euo pipefail
 
 SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
-REPO_ROOT=$(cd -- "$SCRIPT_DIR/.." && pwd)
+REPO_ROOT=$(cd -- "$SCRIPT_DIR/../../.." && pwd)
 RECIPE_DIR="$REPO_ROOT/hooks/claude-cache-safe-images"
 
 SETTINGS_DIR="$HOME/.claude"
@@ -72,4 +72,4 @@ mv "$TMP_SETTINGS" "$SETTINGS_PATH"
 echo "installed recipe: claude-cache-safe-images"
 echo "hook dir: $HOOK_DIR"
 echo "settings updated: $SETTINGS_PATH"
-echo "next: bash \"$REPO_ROOT/scripts/doctor.sh\""
+echo "next: bash \"$REPO_ROOT/hooks/claude-cache-safe-images/scripts/doctor.sh\""
