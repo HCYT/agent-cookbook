@@ -1,65 +1,65 @@
-# Fix Claude cache breakage caused by image inputs
+# 有效解決 Claude cache 被破壞的問題
 
-[繁體中文說明](./README.zh-TW.md)
+[English README](./README.en.md)
 
-If your Claude workflow mixes text turns with image turns, cache reuse can become unstable in practice. A simple fix is to keep the main session text-only and turn images into short text descriptions before they enter the prompt.
+如果你的 Claude workflow 會在文字對話中混入圖片，實務上很容易讓 cache reuse 變差。最直接的解法就是讓主 session 保持純文字，把圖片先轉成短文字描述，再送進 prompt。
 
-This recipe gives you two ways to do that:
+這篇 recipe 提供兩種做法：
 
 1. **Claude Read hook**
-   Intercept local image reads and redirect them to a generated text file.
-2. **Discord adapter example**
-   Describe Discord attachments first, then append the resulting text to your normal prompt.
+   攔截本機圖片讀取，把 `Read` 轉向到一份動態產生的文字描述檔。
+2. **Discord adapter 範例**
+   先描述 Discord 附件，再把文字附加到正常 prompt，而不是直接送圖片 block。
 
-## Included files
+## 內容包含
 
 - `hooks/intercept-image-read.sh`
 - `hooks/image-describe.mjs`
 - `examples/claude-settings.json`
 - `examples/discord-adapter.ts`
 
-## Dependencies
+## 相依需求
 
-Required:
+必要：
 
 - `jq`
 - `node`
-- `gemini` CLI already installed and authenticated
+- `gemini` CLI，且已登入可用
 
-Optional:
+選用：
 
-- `tesseract` for OCR fallback
-- `sips` on macOS for pre-resize
+- `tesseract` 作為 OCR fallback
+- `sips`，在 macOS 上做預縮圖
 
-## Approach
+## 核心做法
 
-The pattern is intentionally simple:
+流程刻意保持簡單：
 
-1. Detect whether the target is an image.
-2. Resize it if the local environment supports cheap resizing.
-3. Run Gemini vision to get a compact semantic description.
-4. Run OCR if available.
-5. Write both outputs into a plain text file.
-6. Feed that text file to Claude instead of the original image.
+1. 判斷目標是不是圖片。
+2. 如果本機支援便宜縮圖，就先縮小。
+3. 用 Gemini vision 產生短語義描述。
+4. 如果有 OCR，就一起補文字。
+5. 把兩者寫成純文字檔。
+6. 讓 Claude 讀這份文字檔，而不是原始圖片。
 
-This keeps the main session free of raw image blocks and usually preserves better cache behavior.
+這樣主 session 就不需要攜帶 raw image blocks，通常能保留更穩定的 cache 行為。
 
-## Install the Claude Read hook
+## 安裝 Claude Read hook
 
-### Fast path
+### 快速路徑
 
-If you already have `gemini`, `node`, and `jq`:
+如果你已經安裝好 `gemini`、`node`、`jq`：
 
 ```bash
 bash scripts/install.sh
 bash scripts/doctor.sh
 ```
 
-### Manual path
+### 手動路徑
 
-Copy the two hook files somewhere stable on your machine, then register the shell script as a `PreToolUse(Read)` hook in your Claude settings.
+把這兩個 hook 檔案放到你機器上的固定位置，然後在 Claude settings 中註冊成 `PreToolUse(Read)` hook。
 
-Example registration:
+註冊範例：
 
 ```json
 {
@@ -80,78 +80,78 @@ Example registration:
 }
 ```
 
-See [`examples/claude-settings.json`](./examples/claude-settings.json) for the same shape.
+可以參考 [`examples/claude-settings.json`](./examples/claude-settings.json)。
 
-## What the installer does
+## Installer 會做什麼
 
-- copies the hook files into `~/.claude/hooks/agent-cookbook/claude-cache-safe-images`
-- makes both scripts executable
-- creates `~/.claude/settings.json` if it does not exist
-- registers the `PreToolUse(Read)` hook idempotently
+- 把 hook 複製到 `~/.claude/hooks/agent-cookbook/claude-cache-safe-images`
+- 自動補上執行權限
+- 如果 `~/.claude/settings.json` 不存在就建立
+- 以 idempotent 方式註冊 `PreToolUse(Read)` hook
 
-The installer does not overwrite unrelated Claude settings.
+Installer 不會覆蓋你其他不相關的 Claude 設定。
 
-## Supported environment variables
+## 可調整的環境變數
 
 `GEMINI_BIN`
-: Defaults to `gemini`
+: 預設是 `gemini`
 
 `GEMINI_MODEL`
-: Optional. If unset, the Gemini CLI default model is used.
+: 選填。不設就使用 Gemini CLI 目前預設模型
 
 `OCR_BIN`
-: Defaults to `tesseract`. Set to `none` to disable OCR.
+: 預設是 `tesseract`。設成 `none` 可關閉 OCR
 
 `MAX_WIDTH`
-: Defaults to `1400`
+: 預設 `1400`
 
-## Discord adapter example
+## Discord adapter 範例
 
-If your agent receives images over Discord, the same idea still applies:
+如果你的 agent 是從 Discord 收圖，做法一樣成立：
 
-- fetch the attachment
-- save it to a temp file
-- describe it first
-- append the text result into the normal prompt
+- 先抓附件
+- 存成暫存檔
+- 先轉文字描述
+- 再把描述文字補進原本的 prompt
 
-The example in [`examples/discord-adapter.ts`](./examples/discord-adapter.ts) shows the minimal shape without any project-specific session system.
+[`examples/discord-adapter.ts`](./examples/discord-adapter.ts) 展示的是最小可改寫版本，不依賴任何特定 session 架構。
 
-## Direct use with subagents or `codex exec`
+## 直接拿去配 subagent 或 `codex exec`
 
-You do not need the Claude hook if you only want the image-to-text step itself.
+如果你只想要「圖片先轉文字」這一步，其實不一定要掛 Claude hook。
 
-### Direct CLI use
+### 直接 CLI 使用
 
 ```bash
 node recipes/claude-cache-safe-images/hooks/image-describe.mjs ./screenshot.png
 ```
 
-### Feed the result into `codex exec`
+### 丟給 `codex exec`
 
 ```bash
 IMG_TEXT="$(node recipes/claude-cache-safe-images/hooks/image-describe.mjs ./screenshot.png)"
 codex exec "Treat the following as the screenshot content:\n\n$IMG_TEXT\n\nNow debug the issue."
 ```
 
-### Feed the result into a subagent
+### 丟給 subagent
 
-Use the same pattern: describe the image first, then pass the text to the subagent prompt. This is useful when you want the orchestration layer to stay cache-friendly while still giving the worker enough visual context.
+也是同樣模式：先把圖片轉成文字，再把那段文字放進 subagent prompt。這樣 orchestration layer 可以維持 cache-friendly，同時保留足夠的視覺資訊。
 
-## Privacy notes
+## 隱私說明
 
-This public version intentionally avoids:
+這個公開版刻意避開：
 
-- hard-coded user paths
-- private OAuth files
-- private client IDs or secrets
-- project-specific bot names
-- repo-specific imports
+- 寫死的使用者路徑
+- 私有 OAuth 檔案
+- 私有 client ID / secret
+- 專案專屬 bot 名稱
+- repo 專屬 import
 
-If your original implementation uses internal OCR tools or direct HTTP APIs, keep those private and expose only the integration contract here.
+如果你原本的版本有內部 OCR 工具或直接打私有 API，建議那些仍留在私有環境，只公開整合介面與模式。
 
-## Limitations
+## 限制
 
-- OCR quality depends on your local OCR engine.
-- Gemini CLI behavior can vary by installed version and configured default model.
-- The example resize path is macOS-first because `sips` is cheap and already present there.
-- The generated temp description files are intentionally left in your temp directory so Claude can read them after the hook returns.
+- OCR 品質取決於你本機的 OCR engine。
+- Gemini CLI 行為會受安裝版本與預設模型影響。
+- 目前縮圖路徑偏 macOS，因為 `sips` 夠便宜而且預設就有。
+- 產生的暫存描述檔會故意保留在 temp 目錄，讓 Claude hook 回傳後仍能讀到。

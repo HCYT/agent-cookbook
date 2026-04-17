@@ -1,40 +1,40 @@
 # Agent Cookbook
 
-[繁體中文說明](./README.zh-TW.md)
+[English README](./README.en.md)
 
-Practical recipes for making coding agents cheaper, safer, and easier to operate.
+給 coding agent 用的實戰 cookbook。重點不是框架，而是那些真的能降低成本、提高穩定性、改善操作體驗的小型腳本、hook、adapter、workflow。
 
-This repository starts with one small chapter and leaves room for many more:
+這個 repo 目前只有第一個小篇章，之後可以持續擴充。
 
-| Recipe | What it solves |
+| Recipe | 解決什麼問題 |
 | --- | --- |
-| [`claude-cache-safe-images`](./recipes/claude-cache-safe-images/README.md) | Effective ways to stop image inputs from wrecking Claude cache reuse |
+| [`claude-cache-safe-images`](./recipes/claude-cache-safe-images/README.md) | 有效解決 Claude 因圖片輸入導致 cache 被破壞的問題 |
 
-## Why this repo exists
+## 為什麼做這個 repo
 
-Many useful agent improvements are too small for a full framework but too valuable to stay buried inside one private codebase. This cookbook packages those improvements as reusable scripts, examples, and short integration guides.
+很多 agent 操作優化都很實用，但規模太小，不值得包成完整框架；放在私人專案裡又很難分享。這個 cookbook 的目標就是把這些模式整理成可重用的腳本、範例與短教學。
 
-## What you will find here
+## 你會在這裡找到什麼
 
-- Copy-pasteable hooks
-- Minimal integration examples
-- Opinionated setup notes
-- Public-safe versions of patterns that originally lived inside larger systems
+- 可直接抄用的 hooks
+- 最小可改寫的整合範例
+- 偏實戰的安裝與設定方式
+- 從私人系統抽離出來的公開安全版本
 
-## Current focus
+## 目前主題
 
-The first recipe is titled:
+第一篇 recipe 主題是：
 
-**Fix Claude cache breakage caused by image inputs**
+**有效解決 Claude cache 被破壞的問題**
 
-It covers two practical patterns:
+目前收錄兩種實用做法：
 
-1. A Claude `Read` hook that intercepts image reads and converts them into text descriptions before they enter the main session.
-2. A Discord adapter example that describes attachments first, then appends text into the prompt instead of pushing raw image blocks.
+1. Claude `Read` hook：在圖片進入主 session 之前，先轉成文字描述。
+2. Discord adapter 範例：先描述附件，再把文字補進 prompt，而不是直接丟 raw image blocks。
 
-## Quickstart
+## 快速開始
 
-If you already have `gemini`, `node`, and `jq`, the current recipe is close to plug-and-play:
+如果你已經安裝好 `gemini`、`node`、`jq`，目前這篇 recipe 幾乎可以開箱即用：
 
 ```bash
 git clone <repo-url>
@@ -43,7 +43,7 @@ bash scripts/install.sh
 bash scripts/doctor.sh
 ```
 
-That installs the Claude `Read` hook into `~/.claude/hooks/agent-cookbook/claude-cache-safe-images` and updates `~/.claude/settings.json` for you.
+這會自動把 Claude `Read` hook 裝到 `~/.claude/hooks/agent-cookbook/claude-cache-safe-images`，並幫你更新 `~/.claude/settings.json`。
 
 ## License
 
