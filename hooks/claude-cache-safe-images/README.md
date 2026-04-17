@@ -11,6 +11,37 @@
 2. **Discord 串接範例**
    先描述 Discord 附件，再把文字補回一般 prompt，而不是直接送圖片區塊。
 
+## 為什麼這招有效
+
+### 證據 1：圖片會直接讓 cache 失效
+
+> Anthropic Prompt caching docs
+>
+> “Changes to `tool_choice` or the presence/absence of images anywhere in the prompt will invalidate the cache, requiring a new cache entry to be created.”
+>
+> 文件連結：
+> https://platform.claude.com/docs/en/build-with-claude/prompt-caching
+
+這句的意思很直接：只要 prompt 裡圖片的有無狀態改變，cache 就會失效，要重新建立一筆新的 cache entry。
+
+### 證據 2：多輪對話會一直重送完整歷史
+
+> “each request resends the full conversation history”
+>
+> Anthropic Vision docs
+>
+> 文件連結：
+> https://platform.claude.com/docs/en/build-with-claude/vision
+
+如果圖片是 base64 形式一起留在對話歷史裡，那代表圖片 bytes 也會在每一輪跟著重送，request 會越來越肥。
+
+### 合起來看，問題就是這兩個
+
+- 圖片本身會影響 cache 能不能繼續命中
+- 多輪對話時，圖片如果一直留在歷史裡，request 也會越來越肥
+
+所以這篇 recipe 的核心策略，就是先把圖片轉成精簡文字，再把文字送進主 session。這樣可以同時減少 cache 失效機率，也能把 request 大小壓下來。
+
 ## 內容包含
 
 - `hooks/intercept-image-read.sh`
