@@ -13,21 +13,29 @@
 
 ## 為什麼這招有效
 
-Anthropic 官方文件其實已經把關鍵講得很明白：
+### 證據 1：圖片會直接讓 cache 失效
 
+> Anthropic Prompt caching docs
+>
 > “Changes to `tool_choice` or the presence/absence of images anywhere in the prompt will invalidate the cache, requiring a new cache entry to be created.”
 >
-> 來源：Anthropic Prompt caching docs
+> 文件連結：
 > https://platform.claude.com/docs/en/build-with-claude/prompt-caching
 
-另外在 Vision 文件裡也有提到：
+這句的意思很直接：只要 prompt 裡圖片的有無狀態改變，cache 就會失效，要重新建立一筆新的 cache entry。
+
+### 證據 2：多輪對話會一直重送完整歷史
 
 > “each request resends the full conversation history”
 >
-> 來源：Anthropic Vision docs
+> Anthropic Vision docs
+>
+> 文件連結：
 > https://platform.claude.com/docs/en/build-with-claude/vision
 
-把這兩句放在一起看，意思就很直接了：
+如果圖片是 base64 形式一起留在對話歷史裡，那代表圖片 bytes 也會在每一輪跟著重送，request 會越來越肥。
+
+### 合起來看，問題就是這兩個
 
 - 圖片本身會影響 cache 能不能繼續命中
 - 多輪對話時，圖片如果一直留在歷史裡，request 也會越來越肥

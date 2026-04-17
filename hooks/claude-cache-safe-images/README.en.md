@@ -13,21 +13,29 @@ This recipe gives you two ways to do that:
 
 ## Why this works
 
-Anthropic's docs already state the key points very directly:
+### Evidence 1: images can invalidate the cache
 
+> Anthropic Prompt caching docs
+>
 > “Changes to `tool_choice` or the presence/absence of images anywhere in the prompt will invalidate the cache, requiring a new cache entry to be created.”
 >
-> Source: Anthropic Prompt caching docs
+> Source:
 > https://platform.claude.com/docs/en/build-with-claude/prompt-caching
 
-And the Vision docs also note:
+This is the direct rule: if image presence changes anywhere in the prompt, the cache is invalidated.
+
+### Evidence 2: multi-turn requests resend full history
 
 > “each request resends the full conversation history”
 >
-> Source: Anthropic Vision docs
+> Anthropic Vision docs
+>
+> Source:
 > https://platform.claude.com/docs/en/build-with-claude/vision
 
-Put together, the practical meaning is straightforward:
+If those images stay in the history as base64 payloads, their bytes keep traveling on every turn.
+
+### Put together, the practical meaning is straightforward
 
 - images directly affect whether the cache stays valid;
 - if image bytes keep traveling through multi-turn history, requests get heavier over time.
