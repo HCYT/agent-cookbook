@@ -1,5 +1,7 @@
 # Agent Cookbook
 
+[繁體中文說明](./README.zh-TW.md)
+
 Practical recipes for making coding agents cheaper, safer, and easier to operate.
 
 This repository starts with one small chapter and leaves room for many more:
@@ -23,12 +25,25 @@ Many useful agent improvements are too small for a full framework but too valuab
 
 The first recipe is titled:
 
-**有效解決 Claude cache 被破壞的問題**
+**Fix Claude cache breakage caused by image inputs**
 
 It covers two practical patterns:
 
 1. A Claude `Read` hook that intercepts image reads and converts them into text descriptions before they enter the main session.
 2. A Discord adapter example that describes attachments first, then appends text into the prompt instead of pushing raw image blocks.
+
+## Quickstart
+
+If you already have `gemini`, `node`, and `jq`, the current recipe is close to plug-and-play:
+
+```bash
+git clone <repo-url>
+cd agent-cookbook
+bash scripts/install.sh
+bash scripts/doctor.sh
+```
+
+That installs the Claude `Read` hook into `~/.claude/hooks/agent-cookbook/claude-cache-safe-images` and updates `~/.claude/settings.json` for you.
 
 ## License
 
