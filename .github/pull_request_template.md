@@ -1,7 +1,7 @@
 ## Summary
 
 - what topic this PR adds or changes
-- which section it belongs to
+- why it belongs in this repo
 
 ## Section
 
@@ -9,12 +9,14 @@
 - [ ] `prompt-engineering`
 - [ ] `context-engineering`
 
-## Checklist
+## Acceptance Checklist
 
 - [ ] One topic only
-- [ ] Chinese README updated if needed
-- [ ] English README updated if needed
-- [ ] Examples/scripts/tests updated if needed
+- [ ] Fits clearly into one section
+- [ ] README explains the problem, approach, and usage
+- [ ] Chinese is the default doc language when this topic has user-facing docs
+- [ ] English companion doc added when needed
+- [ ] Examples/scripts/tests included only when they help
 - [ ] No unrelated changes mixed in
 
 ## Notes
