@@ -44,6 +44,26 @@ The pattern is intentionally simple:
 
 This keeps the main session free of raw image blocks and usually preserves better cache behavior.
 
+## Evidence from Anthropic docs
+
+This approach is not guesswork. Anthropic's docs are fairly explicit:
+
+1. The prompt caching docs state that caching references the full prompt prefix, including `tools`, `system`, and `messages`.
+2. The same docs also state that changes to `tool_choice`, or the presence or absence of images anywhere in the prompt, invalidate the cache and require a new cache entry.
+3. The vision docs add that in multi-turn conversations every request resends the full conversation history. If images are base64-encoded, the image bytes are resent on every turn, increasing payload size and latency.
+
+So this recipe is addressing two concrete problems:
+
+- images directly affect whether the cache remains valid;
+- carrying image bytes through multi-turn history makes requests heavier over time.
+
+This recipe avoids that by converting images into compact text before they enter the main session, so the session history stays text-first.
+
+References:
+
+- Anthropic, Prompt caching: https://platform.claude.com/docs/en/build-with-claude/prompt-caching
+- Anthropic, Vision: https://platform.claude.com/docs/en/build-with-claude/vision
+
 ## Install the Claude Read hook
 
 ### Fast path
