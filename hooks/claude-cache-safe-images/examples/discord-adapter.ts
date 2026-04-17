@@ -70,7 +70,7 @@ Usage shape:
 const prompt = await buildPromptWithImages(
   "[Discord @alice] Please debug this screenshot",
   message.attachments,
-  "/ABSOLUTE/PATH/TO/agent-cookbook/recipes/claude-cache-safe-images/hooks/image-describe.mjs",
+  "/ABSOLUTE/PATH/TO/agent-cookbook/hooks/claude-cache-safe-images/hooks/image-describe.mjs",
 );
 
 session.send(prompt);

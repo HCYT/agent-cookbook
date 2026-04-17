@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash /ABSOLUTE/PATH/TO/agent-cookbook/recipes/claude-cache-safe-images/hooks/intercept-image-read.sh",
+            "command": "bash /ABSOLUTE/PATH/TO/agent-cookbook/hooks/claude-cache-safe-images/hooks/intercept-image-read.sh",
             "timeout": 60
           }
         ]
