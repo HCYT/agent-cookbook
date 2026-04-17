@@ -183,7 +183,8 @@ codex exec "Treat the following as the screenshot content:\n\n$IMG_TEXT\n\nNow d
 
 ## 限制
 
-- OCR 品質會受你本機 OCR 工具影響。
-- Gemini CLI 行為會受安裝版本與預設模型影響。
+- OCR 品質會受你本機 OCR 工具影響。`OCR_BIN` 預設是 `tesseract`，且呼叫方式綁定 tesseract CLI 介面（`$OCR_BIN <image> stdout`）。如果要換成別的 OCR 工具，需要自己包一層相容的 wrapper。
+- Gemini CLI 行為會受安裝版本與預設模型影響。圖片路徑透過 `@path` 語法傳入 Gemini CLI，如果路徑含有特殊字元可能需要注意。
 - 目前縮圖流程比較偏 macOS，因為 `sips` 很快，而且系統通常就有。
-- 產生的暫存描述檔會刻意留在 temp 目錄，這樣 Claude hook 回傳之後還讀得到。
+- 產生的暫存描述檔（`claude-image-desc-*.txt`）會刻意留在 temp 目錄，這樣 Claude hook 回傳之後還讀得到。長時間運作下來可能會累積，可以定期清理：`find "${TMPDIR:-/tmp}" -name 'claude-image-desc-*' -mmin +60 -delete`
+- Discord 串接範例直接信任附件的 `contentType`，但實務上 Discord 回傳的 MIME type 不一定正確（例如 JPEG 檔標成 `image/png`）。如果需要更穩的判斷，建議改用 magic bytes 偵測實際格式。

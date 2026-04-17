@@ -168,3 +168,23 @@ codex exec "Treat the following as the screenshot content:\n\n$IMG_TEXT\n\nNow d
 ### Feed the result into a subagent
 
 Use the same pattern: describe the image first, then pass the text to the subagent prompt.
+
+## Privacy notes
+
+This public version intentionally avoids:
+
+- hardcoded user paths
+- private OAuth files
+- private client IDs or secrets
+- project-specific bot names
+- repo-specific imports
+
+If your original setup uses an internal OCR tool or calls a private API directly, keep those parts in your private environment and only share the integration interface and overall approach.
+
+## Limitations
+
+- OCR quality depends on your local OCR tool. `OCR_BIN` defaults to `tesseract` and the invocation is bound to the tesseract CLI interface (`$OCR_BIN <image> stdout`). To use a different OCR tool, you will need a compatible wrapper.
+- Image paths are passed to Gemini CLI via the `@path` syntax. Paths with special characters may need attention.
+- The resize step is macOS-centric because `sips` is fast and usually pre-installed.
+- Generated description files (`claude-image-desc-*.txt`) are intentionally left in the temp directory so the Claude hook can still read them after returning. Over time these may accumulate. You can clean them periodically: `find "${TMPDIR:-/tmp}" -name 'claude-image-desc-*' -mmin +60 -delete`
+- The Discord integration example trusts the attachment `contentType` directly, but in practice Discord may return incorrect MIME types (e.g. labeling a JPEG as `image/png`). For more reliable detection, consider checking magic bytes instead.
