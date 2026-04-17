@@ -11,6 +11,29 @@
 2. **Discord 串接範例**
    先描述 Discord 附件，再把文字補回一般 prompt，而不是直接送圖片區塊。
 
+## 為什麼這招有效
+
+Anthropic 官方文件其實已經把關鍵講得很明白：
+
+> “Changes to `tool_choice` or the presence/absence of images anywhere in the prompt will invalidate the cache, requiring a new cache entry to be created.”
+>
+> 來源：Anthropic Prompt caching docs
+> https://platform.claude.com/docs/en/build-with-claude/prompt-caching
+
+另外在 Vision 文件裡也有提到：
+
+> “each request resends the full conversation history”
+>
+> 來源：Anthropic Vision docs
+> https://platform.claude.com/docs/en/build-with-claude/vision
+
+把這兩句放在一起看，意思就很直接了：
+
+- 圖片本身會影響 cache 能不能繼續命中
+- 多輪對話時，圖片如果一直留在歷史裡，request 也會越來越肥
+
+所以這篇 recipe 的核心策略，就是先把圖片轉成精簡文字，再把文字送進主 session。這樣可以同時減少 cache 失效機率，也能把 request 大小壓下來。
+
 ## 內容包含
 
 - `hooks/intercept-image-read.sh`
@@ -43,26 +66,6 @@
 6. 讓 Claude 讀這份文字檔，而不是原始圖片。
 
 這樣主 session 就不用夾帶原始圖片區塊，通常能把 cache 表現維持得比較穩。
-
-## 官方文件依據
-
-這個做法不是憑感覺猜的，Anthropic 官方文件其實講得很直接：
-
-1. Prompt caching 文件明確寫到，快取看的不是局部片段，而是整個 prompt prefix，包含 `tools`、`system`、`messages`。
-2. 同一份文件也明確寫到：只要 `tool_choice` 改變，或 prompt 任何地方的圖片出現 / 消失，cache 就會失效，需要建立新的 cache entry。
-3. Vision 文件另外補充，多輪對話裡每次 request 都會重送完整對話歷史；如果圖片是 base64，整張圖的 bytes 也會每一輪都跟著送出去，payload 會變大、延遲也會上升。
-
-換句話說，這篇 recipe 要處理的是兩件事：
-
-- 圖片本身會直接影響 cache 是否還能命中
-- 圖片 bytes 留在多輪歷史裡，request 也會越來越肥
-
-這篇 recipe 的做法，就是把圖片先轉成精簡文字，再讓主 session 吃文字版內容。這樣至少可以避免把原始圖片區塊一路帶進多輪歷史裡。
-
-參考文件：
-
-- Anthropic, Prompt caching: https://platform.claude.com/docs/en/build-with-claude/prompt-caching
-- Anthropic, Vision: https://platform.claude.com/docs/en/build-with-claude/vision
 
 ## 安裝 Claude Read hook
 
