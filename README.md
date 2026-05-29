@@ -17,6 +17,8 @@
 | 分類 | Recipe | 解決什麼問題 |
 | --- | --- | --- |
 | Hooks | [`claude-cache-safe-images`](./hooks/claude-cache-safe-images/README.md) | 有效解決 Claude 因圖片輸入導致 cache 被破壞的問題 |
+| Prompt | [`codex-image-generation`](./prompt-engineering/codex-image-generation/README.md) | 用 Codex OAuth 呼叫 ChatGPT 生圖 API — 認證、串流、批次 |
+| Prompt | [`image-gen-strategies`](./prompt-engineering/image-gen-strategies/README.md) | 生圖 prompt 實戰策略 — 正反 prompt、參考圖、矩陣批次、品質控管 |
 
 ## 為什麼做這個 repo
 
