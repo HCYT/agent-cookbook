@@ -48,16 +48,16 @@ Output:
 - Approval question
 ```
 
-## Safe run pattern
+## 安全執行模式
 
-1. Start with `HERMES_TWEET_ENABLE_ACTIONS` unset or false.
-2. Ask Hermes Agent to run the prompt and collect read-only evidence.
-3. Review the candidate drafts and JSON payload.
-4. Enable `HERMES_TWEET_ENABLE_ACTIONS=true` only for the publishing session.
-5. Reply with one explicit approval sentence.
-6. Turn the action gate off again after the task finishes.
+1. 一開始先不設定 `HERMES_TWEET_ENABLE_ACTIONS`，或將其設為 false。
+2. 讓 Hermes Agent 執行 prompt 並收集唯讀證據。
+3. 審查候選草稿和 JSON payload。
+4. 只在準備發布的 session 啟用 `HERMES_TWEET_ENABLE_ACTIONS=true`。
+5. 回覆一句明確的核准語句。
+6. 任務完成後，再次關閉寫入權限。
 
-## Example task
+## 範例任務
 
 ```text
 Monitor posts about the v0.1.6 Hermes Tweet release.
@@ -66,6 +66,6 @@ Draft 2 replies in a calm maintainer voice.
 Do not publish until I approve the exact payload.
 ```
 
-## Why this shape works
+## 為什麼這種模式有效
 
-The prompt keeps discovery and writing separate. It also makes the model expose the action payload before sending it, so humans can catch bad links, wrong accounts, missing context, or tone problems while the write gate is still closed.
+這個 prompt 會把探索與寫入分開。它也要求模型在送出前先展示 action payload，讓人在寫入權限仍關閉時，就能發現錯誤連結、錯誤帳號、缺少上下文或語氣不合適的問題。
