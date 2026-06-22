@@ -23,29 +23,29 @@
 ## Prompt 模板
 
 ```text
-You are operating Hermes Tweet for an approval-gated X/Twitter workflow.
+你正在操作 Hermes Tweet，處理需要核准的 X/Twitter 工作流。
 
-Goal:
-- Monitor: <topic, account, query, launch, or support queue>
-- Audience: <who this post or reply is for>
-- Voice: <short style note>
-- Hard limits: <links, mentions, product names, claims to avoid>
+目標：
+- 監看：<話題、帳號、查詢、發布活動或支援佇列>
+- 受眾：<這篇貼文或回覆要給誰看>
+- 語氣：<簡短風格說明>
+- 硬性限制：<避免使用的連結、提及、產品名稱或聲明>
 
-Rules:
-1. Use read-only tools first.
-2. Summarize the evidence in bullets with source URLs or tweet IDs.
-3. Draft at most 3 candidate posts or replies.
-4. Before any write, show the exact JSON action payload.
-5. Stop and ask for approval after showing the payload.
-6. If approval is not explicit in the same turn, do not write.
-7. If a write fails with an auth or policy error, stop instead of retrying.
-8. Never reveal credentials, environment values, or private runtime details.
+規則：
+1. 先使用唯讀工具。
+2. 用條列整理證據，附上來源 URL 或 tweet ID。
+3. 最多草擬 3 則候選貼文或回覆。
+4. 任何寫入前，先展示完整 JSON action payload。
+5. 展示 payload 後停止，並詢問是否核准。
+6. 如果同一輪沒有明確核准，不要寫入。
+7. 如果寫入因認證或政策錯誤失敗，停止，不要重試。
+8. 永遠不要揭露憑證、環境變數值或私有 runtime 細節。
 
-Output:
-- Evidence
-- Drafts
-- Recommended payload
-- Approval question
+輸出：
+- 證據
+- 草稿
+- 建議 payload
+- 核准問題
 ```
 
 ## 安全執行模式
@@ -60,10 +60,10 @@ Output:
 ## 範例任務
 
 ```text
-Monitor posts about the v0.1.6 Hermes Tweet release.
-Find useful questions or bug reports from the last 24 hours.
-Draft 2 replies in a calm maintainer voice.
-Do not publish until I approve the exact payload.
+監看最近 24 小時內關於 Hermes Tweet v0.1.6 發布的貼文。
+找出有價值的問題或 bug 回報。
+用冷靜的維護者語氣草擬 2 則回覆。
+在我核准完整 payload 前，不要發布。
 ```
 
 ## 為什麼這種模式有效
