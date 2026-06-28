@@ -29,10 +29,10 @@ DESC_FILE=$(mktemp "${TMP_DIR%/}/claude-image-desc-${TIMESTAMP}-XXXXXX.txt")
 WORK_FILE="$FILE_PATH"
 RESIZED_FILE="$WORK_FILE"
 OCR_FILE=$(mktemp "${TMP_DIR%/}/claude-image-ocr-${TIMESTAMP}-XXXXXX.txt")
-GEMINI_FILE=$(mktemp "${TMP_DIR%/}/claude-image-gemini-${TIMESTAMP}-XXXXXX.txt")
+VISION_FILE=$(mktemp "${TMP_DIR%/}/claude-image-vision-${TIMESTAMP}-XXXXXX.txt")
 
 cleanup() {
-  rm -f "$OCR_FILE" "$GEMINI_FILE" 2>/dev/null || true
+  rm -f "$OCR_FILE" "$VISION_FILE" 2>/dev/null || true
   if [ "$RESIZED_FILE" != "$WORK_FILE" ]; then
     rm -f "$RESIZED_FILE" 2>/dev/null || true
   fi
@@ -100,31 +100,31 @@ resize_if_needed
 run_ocr > "$OCR_FILE" &
 OCR_PID=$!
 
-node "$SCRIPT_DIR/image-describe.mjs" "$RESIZED_FILE" > "$GEMINI_FILE" 2>/dev/null &
-GEMINI_PID=$!
+node "$SCRIPT_DIR/image-describe.mjs" "$RESIZED_FILE" > "$VISION_FILE" 2>/dev/null &
+VISION_PID=$!
 
 wait "$OCR_PID" 2>/dev/null || true
-wait "$GEMINI_PID" 2>/dev/null || true
+wait "$VISION_PID" 2>/dev/null || true
 
-GEMINI_DESC=$(cat "$GEMINI_FILE" 2>/dev/null || true)
+VISION_DESC=$(cat "$VISION_FILE" 2>/dev/null || true)
 OCR_TEXT=$(cat "$OCR_FILE" 2>/dev/null || true)
 
 {
   echo "[Image: $(basename "$FILE_PATH")]"
   echo
-  if [ -n "$GEMINI_DESC" ]; then
-    echo "$GEMINI_DESC"
+  if [ -n "$VISION_DESC" ]; then
+    echo "$VISION_DESC"
   fi
   if [ -n "$OCR_TEXT" ]; then
     echo
-    if [ -n "$GEMINI_DESC" ]; then
+    if [ -n "$VISION_DESC" ]; then
       echo "[OCR Supplement]"
     else
       echo "[OCR Text]"
     fi
     echo "$OCR_TEXT"
   fi
-  if [ -z "$GEMINI_DESC" ] && [ -z "$OCR_TEXT" ]; then
+  if [ -z "$VISION_DESC" ] && [ -z "$OCR_TEXT" ]; then
     echo "(Unable to describe image content)"
   fi
 } > "$DESC_FILE"
@@ -133,6 +133,6 @@ jq -n --arg path "$DESC_FILE" '{
   hookSpecificOutput: {
     hookEventName: "PreToolUse",
     updatedInput: { file_path: $path },
-    additionalContext: "The image was converted into a text description before entering the main session to reduce Claude cache churn."
+    additionalContext: "The image was converted into a text description before entering the main session to reduce token consumption."
   }
 }'

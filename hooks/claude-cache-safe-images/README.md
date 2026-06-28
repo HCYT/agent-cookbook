@@ -1,8 +1,8 @@
-# 有效解決 Claude cache 被破壞的問題
+# 用圖片轉文字降低 Claude token 消耗
 
 [English README](./README.en.md)
 
-如果你的 Claude 使用流程會在文字對話中夾帶圖片，實務上很容易把快取打亂，讓後面的 cache 命中率掉下來。最直接的做法，就是讓主 session 維持純文字，把圖片先轉成精簡的文字描述，再送進 prompt。
+如果你的 Claude 使用流程會在文字對話中夾帶圖片，圖片 bytes（尤其是 base64）會大幅拉高每一輪的 token 消耗，而且在多輪對話中會隨著歷史一起重送。最直接的做法，就是讓主 session 維持純文字，把圖片先轉成精簡的文字描述，再送進 prompt。
 
 這篇 recipe 提供兩種做法：
 
@@ -13,34 +13,12 @@
 
 ## 為什麼這招有效
 
-### 證據 1：圖片會直接讓 cache 失效
+圖片進入 prompt 會造成兩個實際成本：
 
-> Anthropic Prompt caching docs
->
-> “Changes to `tool_choice` or the presence/absence of images anywhere in the prompt will invalidate the cache, requiring a new cache entry to be created.”
->
-> 文件連結：
-> https://platform.claude.com/docs/en/build-with-claude/prompt-caching
+1. **Token 膨脹** — 一張截圖 base64 編碼後可以吃掉數千 token，而多輪對話每一輪都會重送完整歷史（[Anthropic Vision docs](https://platform.claude.com/docs/en/build-with-claude/vision)），圖片 bytes 跟著累積，request 越來越肥。
+2. **request 大小** — 圖片 payload 拉高每一輪的傳輸量和處理時間。
 
-這句的意思很直接：只要 prompt 裡圖片的有無狀態改變，cache 就會失效，要重新建立一筆新的 cache entry。
-
-### 證據 2：多輪對話會一直重送完整歷史
-
-> “each request resends the full conversation history”
->
-> Anthropic Vision docs
->
-> 文件連結：
-> https://platform.claude.com/docs/en/build-with-claude/vision
-
-如果圖片是 base64 形式一起留在對話歷史裡，那代表圖片 bytes 也會在每一輪跟著重送，request 會越來越肥。
-
-### 合起來看，問題就是這兩個
-
-- 圖片本身會影響 cache 能不能繼續命中
-- 多輪對話時，圖片如果一直留在歷史裡，request 也會越來越肥
-
-所以這篇 recipe 的核心策略，就是先把圖片轉成精簡文字，再把文字送進主 session。這樣可以同時減少 cache 失效機率，也能把 request 大小壓下來。
+把圖片先轉成一段精簡文字（通常幾百 token），再送進主 session，就能大幅壓低每一輪的 token 消耗和 request 大小。
 
 ## 內容包含
 
@@ -55,7 +33,7 @@
 
 - `jq`
 - `node`
-- `gemini` CLI，且已登入可用
+- 任何支援 vision 的 CLI 或 agent（預設 `agy`）。只要能接受 `-p` prompt 和 `@path` 圖片語法的工具都行，例如 `agy`、`codex`、`claude`、`devin`、`gemini`，或自己包的 API wrapper。透過 `VISION_CLI_BIN` 環境變數切換
 
 選配：
 
@@ -68,18 +46,18 @@
 
 1. 判斷目標是不是圖片。
 2. 如果本機支援快速縮圖，就先縮小。
-3. 用 Gemini vision 產生精簡的語意描述。
+3. 用 vision CLI 產生精簡的語意描述。
 4. 如果有 OCR，就一起補文字。
 5. 把兩者寫成純文字檔。
 6. 讓 Claude 讀這份文字檔，而不是原始圖片。
 
-這樣主 session 就不用夾帶原始圖片區塊，通常能把 cache 表現維持得比較穩。
+這樣主 session 就不用夾帶原始圖片區塊，token 消耗可以大幅降低。
 
 ## 安裝 Claude Read hook
 
 ### 快速路徑
 
-如果你已經裝好 `gemini`、`node`、`jq`：
+如果你已經裝好 `agy`（或其他 vision CLI）、`node`、`jq`：
 
 ```bash
 cd hooks/claude-cache-safe-images
@@ -125,11 +103,11 @@ Installer 不會去改你其他不相干的 Claude 設定。
 
 ## 可調整的環境變數
 
-`GEMINI_BIN`
-: 預設是 `gemini`
+`VISION_CLI_BIN`
+: 預設是 `agy`。可以換成任何支援 `-p` prompt 和 `@path` 圖片語法的 vision CLI
 
-`GEMINI_MODEL`
-: 選填。不設的話，就沿用 Gemini CLI 目前的預設模型
+`VISION_CLI_MODEL`
+: 選填。不設的話，就沿用該 CLI 的預設模型
 
 `OCR_BIN`
 : 預設是 `tesseract`。設成 `none` 可關閉 OCR
@@ -167,7 +145,7 @@ codex exec "Treat the following as the screenshot content:\n\n$IMG_TEXT\n\nNow d
 
 ### 丟給 subagent
 
-做法也一樣：先把圖片轉成文字，再把那段文字放進 subagent prompt。這樣上層協調流程還是能保住比較好的 cache 表現，同時又留住足夠的視覺資訊。
+做法也一樣：先把圖片轉成文字，再把那段文字放進 subagent prompt。這樣可以大幅降低 token 消耗，同時又留住足夠的視覺資訊。
 
 ## 隱私說明
 
@@ -183,8 +161,9 @@ codex exec "Treat the following as the screenshot content:\n\n$IMG_TEXT\n\nNow d
 
 ## 限制
 
+- **不適合需要細節的場景** — 這個做法把圖片壓成幾百 token 的文字摘要，如果你的任務需要 agent 讀取圖片裡的精確細節（像素級 UI 比對、複雜圖表數據、細小文字），應該直接送原始圖片，不要用摘要。
 - OCR 品質會受你本機 OCR 工具影響。`OCR_BIN` 預設是 `tesseract`，且呼叫方式綁定 tesseract CLI 介面（`$OCR_BIN <image> stdout`）。如果要換成別的 OCR 工具，需要自己包一層相容的 wrapper。
-- Gemini CLI 行為會受安裝版本與預設模型影響。圖片路徑透過 `@path` 語法傳入 Gemini CLI，如果路徑含有特殊字元可能需要注意。
+- Vision CLI 行為會受安裝版本與預設模型影響。圖片路徑透過 `@path` 語法傳入 CLI，如果路徑含有特殊字元可能需要注意。
 - 目前縮圖流程比較偏 macOS，因為 `sips` 很快，而且系統通常就有。
 - 產生的暫存描述檔（`claude-image-desc-*.txt`）會刻意留在 temp 目錄，這樣 Claude hook 回傳之後還讀得到。長時間運作下來可能會累積，可以定期清理：`find "${TMPDIR:-/tmp}" -name 'claude-image-desc-*' -mmin +60 -delete`
 - Discord 串接範例直接信任附件的 `contentType`，但實務上 Discord 回傳的 MIME type 不一定正確（例如 JPEG 檔標成 `image/png`）。如果需要更穩的判斷，建議改用 magic bytes 偵測實際格式。

@@ -7,8 +7,8 @@ if (!imagePath) {
   process.exit(1);
 }
 
-const geminiBin = process.env.GEMINI_BIN || "gemini";
-const geminiModel = process.env.GEMINI_MODEL || "";
+const visionBin = process.env.VISION_CLI_BIN || "agy";
+const visionModel = process.env.VISION_CLI_MODEL || "";
 
 const prompt = [
   `Read this image first: @${imagePath}`,
@@ -22,12 +22,12 @@ const prompt = [
 ].join("\n");
 
 const args = [];
-if (geminiModel) {
-  args.push("-m", geminiModel);
+if (visionModel) {
+  args.push("--model", visionModel);
 }
 args.push("-p", prompt);
 
-const result = spawnSync(geminiBin, args, {
+const result = spawnSync(visionBin, args, {
   encoding: "utf8",
   stdio: ["ignore", "pipe", "ignore"],
 });

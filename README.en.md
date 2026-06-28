@@ -16,7 +16,7 @@ This repository starts with one small chapter and leaves room for many more:
 
 | Section | Recipe | What it solves |
 | --- | --- | --- |
-| Hooks | [`claude-cache-safe-images`](./hooks/claude-cache-safe-images/README.en.md) | Effective ways to stop image inputs from wrecking Claude cache reuse |
+| Hooks | [`claude-cache-safe-images`](./hooks/claude-cache-safe-images/README.en.md) | Convert images to text summaries before entering the session, dramatically reducing Claude token consumption |
 | Prompt | [`codex-image-generation`](./prompt-engineering/codex-image-generation/README.en.md) | Generate images via ChatGPT Responses API using Codex OAuth — auth, streaming, batch |
 | Prompt | [`image-gen-strategies`](./prompt-engineering/image-gen-strategies/README.en.md) | Image generation prompt strategies — positive/negative, references, batch matrix, QA |
 
@@ -35,7 +35,7 @@ Many useful agent improvements are too small for a full framework but too valuab
 
 The first recipe lives under `hooks/`:
 
-**Fix Claude cache breakage caused by image inputs**
+**Reduce Claude token consumption by converting images to text**
 
 It covers two practical patterns:
 
@@ -44,7 +44,7 @@ It covers two practical patterns:
 
 ## Quickstart
 
-If you already have `gemini`, `node`, and `jq`, the current recipe is close to plug-and-play:
+If you already have `agy` (or another vision CLI), `node`, and `jq`, the current recipe is close to plug-and-play:
 
 ```bash
 git clone <repo-url>

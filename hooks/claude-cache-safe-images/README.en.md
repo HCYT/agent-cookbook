@@ -1,8 +1,8 @@
-# Fix Claude cache breakage caused by image inputs
+# Reduce Claude token consumption by converting images to text
 
 [繁體中文說明](./README.md)
 
-If your Claude workflow mixes text turns with image turns, cache reuse can become unstable in practice. A simple fix is to keep the main session text-only and turn images into short text descriptions before they enter the prompt.
+If your Claude workflow mixes text turns with image turns, image bytes (especially base64) dramatically inflate the token count on every turn, and multi-turn conversations resend the full history each time. A simple fix is to keep the main session text-only and turn images into short text descriptions before they enter the prompt.
 
 This recipe gives you two ways to do that:
 
@@ -13,34 +13,12 @@ This recipe gives you two ways to do that:
 
 ## Why this works
 
-### Evidence 1: images can invalidate the cache
+Images in a prompt create two concrete costs:
 
-> Anthropic Prompt caching docs
->
-> “Changes to `tool_choice` or the presence/absence of images anywhere in the prompt will invalidate the cache, requiring a new cache entry to be created.”
->
-> Source:
-> https://platform.claude.com/docs/en/build-with-claude/prompt-caching
+1. **Token bloat** — a single screenshot base64-encoded can consume thousands of tokens, and multi-turn conversations resend the full history on every turn ([Anthropic Vision docs](https://platform.claude.com/docs/en/build-with-claude/vision)), so image bytes accumulate and requests grow heavier over time.
+2. **Request size** — large image payloads increase transfer time and processing overhead per turn.
 
-This is the direct rule: if image presence changes anywhere in the prompt, the cache is invalidated.
-
-### Evidence 2: multi-turn requests resend full history
-
-> “each request resends the full conversation history”
->
-> Anthropic Vision docs
->
-> Source:
-> https://platform.claude.com/docs/en/build-with-claude/vision
-
-If those images stay in the history as base64 payloads, their bytes keep traveling on every turn.
-
-### Put together, the practical meaning is straightforward
-
-- images directly affect whether the cache stays valid;
-- if image bytes keep traveling through multi-turn history, requests get heavier over time.
-
-That is why this recipe converts images into compact text before they enter the main session.
+Converting an image into a short text description (typically a few hundred tokens) before it enters the main session dramatically reduces per-turn token consumption and request size.
 
 ## Included files
 
@@ -55,7 +33,7 @@ Required:
 
 - `jq`
 - `node`
-- `gemini` CLI already installed and authenticated
+- Any vision-capable CLI or agent (defaults to `agy`). Anything that accepts `-p` prompts and `@path` image syntax works — `agy`, `codex`, `claude`, `devin`, `gemini`, or your own API wrapper. Switch via the `VISION_CLI_BIN` env var
 
 Optional:
 
@@ -68,18 +46,18 @@ The pattern is intentionally simple:
 
 1. Detect whether the target is an image.
 2. Resize it if the local environment supports cheap resizing.
-3. Run Gemini vision to get a compact semantic description.
+3. Run the vision CLI to get a compact semantic description.
 4. Run OCR if available.
 5. Write both outputs into a plain text file.
 6. Feed that text file to Claude instead of the original image.
 
-This keeps the main session free of raw image blocks and usually preserves better cache behavior.
+This keeps the main session free of raw image blocks and dramatically reduces token consumption.
 
 ## Install the Claude Read hook
 
 ### Fast path
 
-If you already have `gemini`, `node`, and `jq`:
+If you already have `agy` (or another vision CLI), `node`, and `jq`:
 
 ```bash
 cd hooks/claude-cache-safe-images
@@ -125,11 +103,11 @@ The installer does not overwrite unrelated Claude settings.
 
 ## Supported environment variables
 
-`GEMINI_BIN`
-: Defaults to `gemini`
+`VISION_CLI_BIN`
+: Defaults to `agy`. Can be any vision CLI that supports `-p` prompts and `@path` image syntax.
 
-`GEMINI_MODEL`
-: Optional. If unset, the Gemini CLI default model is used.
+`VISION_CLI_MODEL`
+: Optional. If unset, the CLI's default model is used.
 
 `OCR_BIN`
 : Defaults to `tesseract`. Set to `none` to disable OCR.
@@ -183,8 +161,9 @@ If your original setup uses an internal OCR tool or calls a private API directly
 
 ## Limitations
 
+- **Not suitable when fine detail matters** — this approach compresses images into a short text summary of a few hundred tokens. If your task requires the agent to read precise image details (pixel-level UI comparisons, complex chart data, fine print), send the original image directly instead of using this recipe.
 - OCR quality depends on your local OCR tool. `OCR_BIN` defaults to `tesseract` and the invocation is bound to the tesseract CLI interface (`$OCR_BIN <image> stdout`). To use a different OCR tool, you will need a compatible wrapper.
-- Image paths are passed to Gemini CLI via the `@path` syntax. Paths with special characters may need attention.
+- Image paths are passed to the vision CLI via the `@path` syntax. Paths with special characters may need attention.
 - The resize step is macOS-centric because `sips` is fast and usually pre-installed.
 - Generated description files (`claude-image-desc-*.txt`) are intentionally left in the temp directory so the Claude hook can still read them after returning. Over time these may accumulate. You can clean them periodically: `find "${TMPDIR:-/tmp}" -name 'claude-image-desc-*' -mmin +60 -delete`
 - The Discord integration example trusts the attachment `contentType` directly, but in practice Discord may return incorrect MIME types (e.g. labeling a JPEG as `image/png`). For more reliable detection, consider checking magic bytes instead.
