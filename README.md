@@ -16,7 +16,7 @@
 
 | 分類 | Recipe | 解決什麼問題 |
 | --- | --- | --- |
-| Hooks | [`claude-cache-safe-images`](./hooks/claude-cache-safe-images/README.md) | 有效解決 Claude 因圖片輸入導致 cache 被破壞的問題 |
+| Hooks | [`claude-cache-safe-images`](./hooks/claude-cache-safe-images/README.md) | 把圖片轉成文字摘要送進 session，大幅降低 Claude token 消耗 |
 | Prompt | [`codex-image-generation`](./prompt-engineering/codex-image-generation/README.md) | 用 Codex OAuth 呼叫 ChatGPT 生圖 API — 認證、串流、批次 |
 | Prompt | [`image-gen-strategies`](./prompt-engineering/image-gen-strategies/README.md) | 生圖 prompt 實戰策略 — 正反 prompt、參考圖、矩陣批次、品質控管 |
 
@@ -35,7 +35,7 @@
 
 第一篇 recipe 主題放在 `hooks/` 底下：
 
-**有效解決 Claude cache 被破壞的問題**
+**用圖片轉文字降低 Claude token 消耗**
 
 目前先整理兩種很實用的做法：
 
@@ -44,7 +44,7 @@
 
 ## 快速開始
 
-如果你已經裝好 `gemini`、`node`、`jq`，這篇 recipe 基本上已經很接近開箱即用了：
+如果你已經裝好 `agy`（或其他 vision CLI）、`node`、`jq`，這篇 recipe 基本上已經很接近開箱即用了：
 
 ```bash
 git clone <repo-url>

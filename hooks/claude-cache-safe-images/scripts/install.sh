@@ -20,7 +20,7 @@ require_cmd() {
 
 require_cmd jq
 require_cmd node
-require_cmd gemini
+require_cmd "${VISION_CLI_BIN:-agy}"
 
 mkdir -p "$HOOK_DIR"
 mkdir -p "$SETTINGS_DIR"

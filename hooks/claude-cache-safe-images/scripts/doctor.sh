@@ -19,7 +19,7 @@ STATUS=0
 
 check_cmd jq || STATUS=1
 check_cmd node || STATUS=1
-check_cmd gemini || STATUS=1
+check_cmd "${VISION_CLI_BIN:-agy}" || STATUS=1
 
 if [ -x "$HOOK_DIR/intercept-image-read.sh" ]; then
   echo "ok   file: $HOOK_DIR/intercept-image-read.sh"

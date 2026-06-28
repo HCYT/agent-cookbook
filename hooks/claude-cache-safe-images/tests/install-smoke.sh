@@ -15,11 +15,11 @@ test -d "$REPO_ROOT/context-engineering"
 mkdir -p "$TEST_HOME/.claude"
 printf '{}\n' > "$TEST_HOME/.claude/settings.json"
 
-cat > "$TEST_BIN/gemini" <<'EOF'
+cat > "$TEST_BIN/agy" <<'EOF'
 #!/bin/bash
-echo "stub gemini"
+echo "stub agy"
 EOF
-chmod +x "$TEST_BIN/gemini"
+chmod +x "$TEST_BIN/agy"
 
 HOME="$TEST_HOME" PATH="$TEST_BIN:$PATH" bash "$CASE_DIR/scripts/install.sh"
 HOME="$TEST_HOME" PATH="$TEST_BIN:$PATH" bash "$CASE_DIR/scripts/install.sh"
