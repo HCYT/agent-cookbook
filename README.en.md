@@ -18,6 +18,7 @@ This repository starts with one small chapter and leaves room for many more:
 | --- | --- | --- |
 | Hooks | [`claude-cache-safe-images`](./hooks/claude-cache-safe-images/README.en.md) | Convert images to text summaries before entering the session, dramatically reducing Claude token consumption |
 | Prompt | [`codex-image-generation`](./prompt-engineering/codex-image-generation/README.en.md) | Generate images via ChatGPT Responses API using Codex OAuth — auth, streaming, batch |
+| Prompt | [`hermes-tweet-approval-loop`](./prompt-engineering/hermes-tweet-approval-loop/README.en.md) | Split X/Twitter work into read, draft, human approval, and publish steps with Hermes Tweet |
 | Prompt | [`image-gen-strategies`](./prompt-engineering/image-gen-strategies/README.en.md) | Image generation prompt strategies — positive/negative, references, batch matrix, QA |
 
 ## Why this repo exists
